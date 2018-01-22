@@ -14,8 +14,7 @@ var MAX_HEALTH = 4;
 
 var PLAYER_WIDTH = 25;
 var PLAYER_HEIGHT = 25;
-var healthX = ""
-var healthY = ""
+
 // These two constants keep us from using "magic numbers" in our code
 var LEFT_ARROW_CODE = 37;
 var RIGHT_ARROW_CODE = 39;
@@ -28,7 +27,6 @@ var MOVE_RIGHT = 'right';
 var MOVE_UP = 'up';
 var MOVE_DOWN = 'down';
 var SHOOT = 'shoot';
-var lives = ""
 // Preload game images
 var images = {};
 ['enemy.png', 'stars.png', 'player.png', 'enemy2.png'].forEach(imgName => {
@@ -38,19 +36,9 @@ var images = {};
 });
 
 
-var playerX = "";
-var playerY = "";
 
-function setupMissle() {
-    
-        
-    function launchIt() {
-        
 
-this.missle = new Missle(playerX, playerY);
-return this.missle
-}
-} 
+
 // This section is where you will be doing most of your coding
 class Enemy {
     constructor(xPos) {
@@ -63,8 +51,7 @@ class Enemy {
     }
 
     update(timeDiff) {
-        
-            this.y = this.y + timeDiff * this.speed;
+        this.y = this.y + timeDiff * this.speed;
        
         //this.x = this.x + timeDiff * this.speed  * Math.random();
     }
@@ -91,61 +78,31 @@ class Enemy {
             this.sprite = images['player.png'];
         }
             update(timeDiff){
-            /*    
-            if (Math.random() % 2 === 0) { 
-                this.x = this.x  - 0.8,
-                this.y = this.y - 0.8;
-            } else if (timeDiff % 3 === 0) {this.x = this.x - 0.8;
-                this.y = this.y + 0.8;
-                
-            } else  {
-                this.x = this.x + 0.8;
-                this.y = this.y - 0.8;
-            }
-            */
-            healthX = this.x;
-            healthY = this.y;
+                if (this.x < 600 || this.y > 400) {
+            this.x = this.x + timeDiff * 0.02;
+            this.y = this.y + timeDiff * 0.02;     
+            } else {
+                this.x = this.x - timeDiff / 0.5;
+                this.y = this.x - timeDiff / 0.05;
 
-            this.x = this.x
-            this.y = this.y - timeDiff -2;   
-            console.log("ufo", this.y, this.x )
-        }
-    
-            render(ctx) {
-            ctx.drawImage(this.sprite, this.x, this.y);
-               
-        }
-    }
-    class Missle {
-        constructor(Xpos, Ypos) {
-            this.x = playerX;
-            this.y = playerY;
-            this.sprite = images['player.png'];
-        }
-            update(timeDiff){
                 
-             
-                this.x = this.x,
-                this.y = this.y + timeDiff + 2;
             }
 
-        
+        }
             render(ctx) {
-                healthX = this.x;
-                healthY = this.y;
             ctx.drawImage(this.sprite, this.x, this.y);
-               
+
         }
     }
-
-    
 class Player {
     constructor() {
         this.x = 2 * PLAYER_WIDTH;
         this.y = GAME_HEIGHT - PLAYER_HEIGHT -50; //initial offset
         
         this.sprite = images['enemy.png'];
-        
+        this.Lives = 3
+        if (this.dead === true) { this.lives = 2
+        return this.lives}
     }
 
     // This method is called by the game engine when left/right arrows are pressed
@@ -163,17 +120,14 @@ class Player {
         else if (direction === MOVE_DOWN && this.y < GAME_HEIGHT - PLAYER_HEIGHT * 2) {
             this.y = this.y + PLAYER_HEIGHT
         }
-        else if (direction === SHOOT) { 
-            new Health(playerX, PlayerY);
-        };
+        else if (direction === SHOOT) {
 
-    
-        
+            console.log("BANG BANG");
+           
+        } 
     }
 
     render(ctx) {
-        playerX = this.x;
-        playerY = this.y;
         if (this.lives < 50) {
             this.sprite = images['player.png']
             ctx.drawImage(this.sprite, this.x, this.y);
@@ -185,8 +139,7 @@ class Player {
 }
 
 
-//this.playerX.bind(SHOOT);
-//this.playerY.bind(SHOOT);
+
 
 
 /*
@@ -197,7 +150,7 @@ The engine will try to draw your game at 60 frames per second using the requestA
 class Engine {
 
     constructor(element) {
-        this.lives = 10;
+
 
         // Setup the player
         this.player = new Player();
@@ -206,7 +159,7 @@ class Engine {
         this.setupEnemies();
         console.log("I set up enemies", this.addEnemy())
         
-        setupMissle();
+        
         this.setupHealth();
         console.log("i set up health", this.setupHealth())
         // Setup the <canvas> element where we will be drawing
@@ -220,7 +173,7 @@ class Engine {
         // Since gameLoop will be called out of context, bind it once here.
         this.gameLoop = this.gameLoop.bind(this);
     }
-    
+
     
     resetGame() {
     console.log("is it running");
@@ -228,12 +181,12 @@ class Engine {
             console.log("reset game");
             this.score = 0;
             this.dead = false;
-            this.lives = 10; //this is where lives are kept!
+            this.lives = 10;
             this.lastFrame = Date.now();
             this.enemies = [];
             this.isHealth = [];
             this.player = new Player();
-            this.setupHealth();
+            this.healthy = false;
             
             this.gameLoop();
             
@@ -266,21 +219,27 @@ class Engine {
         this.enemies[enemySpot] = new Enemy(enemySpot * ENEMY_WIDTH);
     }
 
-    setupMissle() {
     
-        
-        function launchIt() {
-            
-    
-    this.missle = new Missle(playerX, playerY);
-    return this.missle
-    }
-    } 
         
     setupHealth() {
-    
+        if (!this.health) {
+            this.healthNumber = [];
+        }
+        var healthCount = 0;
+        while (healthNumber < MAX_HEALTH) {
+            this.addHealth();
+        }
+    }
+    addHealth() {
+        while (healthCount <= 0 || this.isHealth.length < MAX_HEALTH);
+
+        
+        var isHealth = [];
+        var healthCount = 0;
         var HealthX = "";
         var HealthY = "";
+        var isHealthId = isHealth.length - 1;
+        while (isHealth[isHealthId])
             function addHealthX() {
                 
                     HealthX = Math.floor(Math.random() * 200 *2)
@@ -294,19 +253,19 @@ class Engine {
                 }
         addHealthX();
         addHealthY();
-        
-        this.health = new Health(playerX, playerY);
-        
+        healthCount = healthCount +1;
+        this.health = new Health(HealthX, HealthY);
+        HealthNumber.push(this.Health);
      }
        
-
+    
     // This method kicks off the game
     start() {
         this.score = 0;
         this.lastFrame = Date.now();
         this.lives = 10;
         this.dead = false;
-        
+        this.healthy = false;
         
         // Listen for keyboard left/right and update the player
         document.addEventListener('keydown', e => {
@@ -323,7 +282,7 @@ class Engine {
                 this.player.move(MOVE_DOWN);
             }
             else if (e.keyCode === SHOOT_CODE) {
-                this.setupHealth();
+                this.player.move(SHOOT);
             }
             else if (e.keyCode === 82) {
                 this.resetGame();
@@ -348,7 +307,7 @@ class Engine {
         // Check how long it's been since last frame
         var currentFrame = Date.now();
         var timeDiff = currentFrame - this.lastFrame;
-        
+        var lives = 10;
         // Increase the score!
         this.score += timeDiff;
 
@@ -359,28 +318,34 @@ class Engine {
         this.ctx.drawImage(images['stars.png'], 0, 0); // draw the star bg
         
         this.enemies.forEach(enemy => enemy.render(this.ctx));
-        this.lives = this.lives
+        
         this.health.update(timeDiff);
         this.health.render(this.ctx);
          // draw the enemies
         this.player.render(this.ctx); // draw the player
-       // this.missle.render(this.ctx);
-        //this.update(timeDiff);
+
        // this.health.render(this.ctx);
 
         // Check if any enemies should die
         this.enemies.forEach((enemy, enemyIdx) => {
-            if (this.dead === true || enemy.y > GAME_HEIGHT || enemy.x === healthX && enemy.y === healthY) {
+            if (this.dead === true || enemy.y > GAME_HEIGHT) {
                 
                 delete this.enemies[enemyIdx];
                 this.dead = false;
             }
         });
+        this.isHealth.forEach((health, isHealth) => {
+            if (this.dead === true || health.y > GAME_HEIGHT) {
+                delete this.isHealth[isHealthId];
+                this.dead = false;
+            }
+    
+        });
 
         this.setupEnemies();
-
+        this.setupHealth();
         
-console.log(playerX, playerY)        
+        
     
         // Check if player is dead
         if (this.isPlayerDead()) {
@@ -402,12 +367,19 @@ console.log(playerX, playerY)
             
             
         }
-        else if (this.lives <= 0) {
+        else if (this.lives = 0) {
             this.ctx.fillText(this.score + ' Game Over', 5, 30);
             this.ctx.fillText("reset game by pressing spacebar",100,200);
             this.dead = true;
             return true;
-         } 
+         } else if (this.grabHealth) {
+             this.lives = +10;
+             this.ctx.fillText(this.lives +10, 5, 70);
+             this.lastFrame = Date.now();
+            
+             requestAnimationFrame(this.gameLoop);
+ 
+         }
          else {
             // If player is not dead, then draw the score
             this.ctx.font = 'bold 30px Impact';
@@ -423,42 +395,40 @@ console.log(playerX, playerY)
     } 
 
 
-    setupMissle() {
-    
-        
-        function launchIt() {
-            
-    
-    this.missle = new Missle(playerX, playerY);
-    return this.missle
- }
-} 
  
        
-    newMethod(timeDiff) {
-        this.missle.update(timeDiff);
-    }
-
     isPlayerDead() {
-        var enemyHit = (enemy) => {
-            
-            if (enemy.x === this.player.x && (enemy.y + ENEMY_HEIGHT) >= this.player.y) {
-                this.dead = true; //this part is added by luke understand what is going on
-                
-               return true
+       var enemyHit = (enemy) => {
+           
+           if (enemy.x === this.player.x && (enemy.y) >= this.player.y) {
+               this.dead = true; //this part is added by luke understand what is going on
                
+              return true
+              
+
+       }
+    };
+    return this.enemies.some(enemyHit);
+}
+    
+
+
+grabHealth () {
+    var enemyHealth = (health) => {
+    if (health.x ===this.player.x && (health.y) >= this.player.y) {
+        grabHealth = true;
+console.log("holy fuck you grabbed it", grabHealth());
+        return true
+    }  
+}
  
-        }
-     };
-     return this.enemies.some(enemyHit);
- 
-     
-         
-     
-     
-     }
-     
- }
+
+return this.isHealth.some(enemyHealth);
+
+}
+
+}
+
 
 // This section will start the game
 var gameEngine = new Engine(document.getElementById('app'));
