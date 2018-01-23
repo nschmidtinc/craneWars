@@ -1,8 +1,8 @@
 
 
 // This section contains some game constants. It is not super interesting
-var GAME_WIDTH = 750;
-var GAME_HEIGHT = 500;
+var GAME_WIDTH = 800;
+var GAME_HEIGHT = 480;
 
 var ENEMY_WIDTH = 50;
 var ENEMY_HEIGHT = 50;
@@ -29,9 +29,14 @@ var MOVE_UP = 'up';
 var MOVE_DOWN = 'down';
 var SHOOT = 'shoot';
 var lives = ""
+var frasierSong = document.getElementById('frasierSong');
+var frasierDamage = document.getElementById('frasierDamage');
+var frasierGetout = document.getElementById('frasierGetout');
+var frasierniles = document.getElementById('niles');
+var frasierOver = document.getElementById('frasierOver');
 // Preload game images
 var images = {};
-['enemy.png', 'stars.png', 'player.png', 'enemy2.png'].forEach(imgName => {
+['enemy.png', 'stars.png', 'player.png', 'enemy2.png', 'bullet.png', 'eddie.png', 'Niles.png'].forEach(imgName => {
     var img = document.createElement('img');
     img.src = 'images/' + imgName;
     images[imgName] = img;
@@ -40,6 +45,7 @@ var images = {};
 
 var playerX = "";
 var playerY = "";
+var scoreBonus = 0;
 
 function setupMissle() {
     
@@ -59,21 +65,27 @@ class Enemy {
         this.sprite = images['enemy.png'];
 
         // Each enemy should have a different speed
-        this.speed = Math.random() / 4 + 0.75;
+        this.speed = Math.random() / 4 + 0.55;
     }
 
     update(timeDiff) {
         
-            this.y = this.y + timeDiff * this.speed;
-       
+            this.y = this.y + timeDiff * this.speed + (this.speed * 0.01);
+            
         //this.x = this.x + timeDiff * this.speed  * Math.random();
     }
 
     render(ctx) {
-        if (this.speed > 0.9) {
         
-        this.sprite = images['enemy2.png'];
+        var nilesRandom = Math.random() * 100;
+
+        if (this.speed > 0.69 ) {
+            
+        this.sprite = images['Niles.png'];
+        var soundFlag =true;    
+        
         ctx.drawImage(this.sprite, this.x, this.y);
+        
         
         }
         else {
@@ -88,7 +100,7 @@ class Enemy {
         constructor(Xpos, Ypos) {
             this.x = Xpos;
             this.y = Ypos;
-            this.sprite = images['player.png'];
+            this.sprite = images['bullet.png'];
         }
             update(timeDiff){
             /*    
@@ -108,7 +120,7 @@ class Enemy {
 
             this.x = this.x
             this.y = this.y - timeDiff -2;   
-            console.log("ufo", this.y, this.x )
+            console.log("ufo", healthX, healthY )
         }
     
             render(ctx) {
@@ -141,10 +153,10 @@ class Enemy {
     
 class Player {
     constructor() {
-        this.x = 2 * PLAYER_WIDTH;
+        this.x = PLAYER_WIDTH *4;
         this.y = GAME_HEIGHT - PLAYER_HEIGHT -50; //initial offset
         
-        this.sprite = images['enemy.png'];
+        this.sprite = images['player.png'];
         
     }
 
@@ -163,7 +175,10 @@ class Player {
         else if (direction === MOVE_DOWN && this.y < GAME_HEIGHT - PLAYER_HEIGHT * 2) {
             this.y = this.y + PLAYER_HEIGHT
         }
-        else if (direction === SHOOT) { 
+        else if (direction === SHOOT) {
+            
+           
+             
             new Health(playerX, PlayerY);
         };
 
@@ -205,7 +220,7 @@ class Engine {
         // Setup enemies, making sure there are always three
         this.setupEnemies();
         console.log("I set up enemies", this.addEnemy())
-        
+        frasierSong.play();
         setupMissle();
         this.setupHealth();
         console.log("i set up health", this.setupHealth())
@@ -226,6 +241,7 @@ class Engine {
     console.log("is it running");
         if (this.dead || this.healthy) {
             console.log("reset game");
+            frasierniles.currentFrame = 0;
             this.score = 0;
             this.dead = false;
             this.lives = 10; //this is where lives are kept!
@@ -234,9 +250,10 @@ class Engine {
             this.isHealth = [];
             this.player = new Player();
             this.setupHealth();
-            
+            frasierSong 
+            frasierSong.play();
             this.gameLoop();
-            
+            this.scoreBonus = 0;
 
         }
     }
@@ -266,19 +283,27 @@ class Engine {
         this.enemies[enemySpot] = new Enemy(enemySpot * ENEMY_WIDTH);
     }
 
-    setupMissle() {
-    
+    setupMissile() {
+        var soundFlag = true;
+        var HealthX = "";
+        var HealthY = "";
+            function addMissileX() {
+                
+                    MissileX = Math.floor(Math.random() * 200 *2)
+                     while (MissileX > 750) {HealthX = Math.floor(Math.random()*1000)}
+                
+                }
+                
+            function addMissileY() {
+                HealthY = Math.floor(Math.random() * 200 * 2)
+                while (MissileY > 500) {HealthY = Math.floor(Math.random()*100)} 
+                }
+        addMissileX();
+        addMissileY();
         
-        function launchIt() {
-            
-    
-    this.missle = new Missle(playerX, playerY);
-    return this.missle
-    }
     } 
-        
     setupHealth() {
-    
+        var soundFlag = true;
         var HealthX = "";
         var HealthY = "";
             function addHealthX() {
@@ -295,18 +320,27 @@ class Engine {
         addHealthX();
         addHealthY();
         
-        this.health = new Health(playerX, playerY);
         
+        this.health = new Health(playerX, playerY);
+        if (soundFlag) {
+            frasierGetout.pause();
+            frasierGetout.currentTime = 0;
+            frasierGetout.play();
+            soundFlag = false;
+        }
+       
      }
        
 
     // This method kicks off the game
     start() {
+       // frasierSong.play();
         this.score = 0;
         this.lastFrame = Date.now();
         this.lives = 10;
         this.dead = false;
-        
+        this.scoreBonus = 0;
+        frasierniles.play();
         
         // Listen for keyboard left/right and update the player
         document.addEventListener('keydown', e => {
@@ -323,7 +357,9 @@ class Engine {
                 this.player.move(MOVE_DOWN);
             }
             else if (e.keyCode === SHOOT_CODE) {
+
                 this.setupHealth();
+               
             }
             else if (e.keyCode === 82) {
                 this.resetGame();
@@ -356,7 +392,7 @@ class Engine {
         this.enemies.forEach(enemy => enemy.update(timeDiff));
 
         // Draw everything!
-        this.ctx.drawImage(images['stars.png'], 0, 0); // draw the star bg
+        this.ctx.drawImage(images['stars.png'], 0 +1, 0 -1); // draw the star bg
         
         this.enemies.forEach(enemy => enemy.render(this.ctx));
         this.lives = this.lives
@@ -367,13 +403,27 @@ class Engine {
        // this.missle.render(this.ctx);
         //this.update(timeDiff);
        // this.health.render(this.ctx);
-
+       this.isEnemyDead();
         // Check if any enemies should die
         this.enemies.forEach((enemy, enemyIdx) => {
-            if (this.dead === true || enemy.y > GAME_HEIGHT || enemy.x === healthX && enemy.y === healthY) {
-                
+            if (this.enemyDead === true) {
                 delete this.enemies[enemyIdx];
+                this.enemyDead = false;
+            }
+
+        });   
+     
+        this.enemies.forEach((enemy, enemyIdx) => {
+            if (this.dead === true || enemy.y > GAME_HEIGHT || enemy.x === healthX && enemy.y === healthY) {
+               
+                
+                 
+               
+               
+                delete this.enemies[enemyIdx];
+                
                 this.dead = false;
+               
             }
         });
 
@@ -383,10 +433,16 @@ class Engine {
 console.log(playerX, playerY)        
     
         // Check if player is dead
+        var soundFlag = true;
         if (this.isPlayerDead()) {
             // If they are dead, then it's game over!
-            
-            this.ctx.font = 'bold 30px Impact';
+            if (soundFlag) {
+                frasierDamage.pause();
+                frasierDamage.currentTime = 0;
+                frasierDamage.play();
+                soundFlag = false;
+            }
+            this.ctx.font = 'bold 25px Aerial';
             this.ctx.fillStyle = '#ffffff';
         
             //this.ctx.fillText(this.score + ' Game Over', 5, 30);
@@ -394,6 +450,7 @@ console.log(playerX, playerY)
             
             this.ctx.fillText(this.lives -1, 5, 70);
             this.lives = this.lives -1;
+           
             this.lastFrame = Date.now();
             
             requestAnimationFrame(this.gameLoop);
@@ -403,19 +460,38 @@ console.log(playerX, playerY)
             
         }
         else if (this.lives <= 0) {
-            this.ctx.fillText(this.score + ' Game Over', 5, 30);
-            this.ctx.fillText("reset game by pressing spacebar",100,200);
+            var soundFlag = true;
+            this.ctx.font = '20px aerial';
+            this.ctx.fillText(this.score + ' Game Over', 8, 30);
+            this.ctx.fillText("reset game by pressing spacebar",8,200);
             this.dead = true;
+            scoreBonus = 0;
+            if (soundFlag) {
+                {
+                    frasierOver.pause();
+                    frasierOver.currentTime = 0;
+                    frasierOver.play();
+                    soundFlag = false;
+                }
+
+            
             return true;
+            
+            
+
+            }
+            
          } 
+         
          else {
             // If player is not dead, then draw the score
-            this.ctx.font = 'bold 30px Impact';
+            this.ctx.font = '25px Aerial';
             this.ctx.fillStyle = '#ffffff';
             this.ctx.fillText(this.score, 5, 30);
             this.ctx.fillText(this.lives, 5, 70);
-
-            
+            this.ctx.fillText("SHERRY BONUS", 5, 120)
+            this.ctx.fillText(scoreBonus, 5, 150);
+            this.scoreBonus = this.scoreBonus;
             // Set the time marker and redraw
             this.lastFrame = Date.now();
             requestAnimationFrame(this.gameLoop);
@@ -438,7 +514,7 @@ console.log(playerX, playerY)
     newMethod(timeDiff) {
         this.missle.update(timeDiff);
     }
-
+    
     isPlayerDead() {
         var enemyHit = (enemy) => {
             
@@ -446,6 +522,7 @@ console.log(playerX, playerY)
                 this.dead = true; //this part is added by luke understand what is going on
                 
                return true
+              
                
  
         }
@@ -453,13 +530,23 @@ console.log(playerX, playerY)
      return this.enemies.some(enemyHit);
  
      
-         
-     
-     
-     }
+             
      
  }
-
+    isEnemyDead() {
+        var healthHit = (enemy) => {
+            
+        if (enemy.x === healthX && (enemy.y + ENEMY_HEIGHT) >= healthY) {
+            this.enemyDead = true;
+            console.log("direct hit!", this.enemyDead.x)
+            scoreBonus = scoreBonus +1;
+            return true
+        }
+    } 
+        return this.enemies.some(healthHit)
+          
+    }
+}
 // This section will start the game
 var gameEngine = new Engine(document.getElementById('app'));
 gameEngine.start();
